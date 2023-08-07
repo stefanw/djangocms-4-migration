@@ -2,8 +2,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 
@@ -28,6 +28,8 @@ from djangocms_4_migration.models import PageData
 
 
 logger = logging.getLogger(__name__)
+
+User = get_user_model()
 
 src_alias_count = 0
 reference_alias_count = 0
