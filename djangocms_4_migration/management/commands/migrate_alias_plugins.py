@@ -206,9 +206,11 @@ def process_old_alias_sources(site, language, site_plugin_queryset):
         if is_versioning_enabled():
             from djangocms_versioning.models import Version
             # Create version
-            changed_by = User.objects.get(username=old_plugin.placeholder.source.changed_by)
-            version = Version.objects.create(content=alias_content, created_by=changed_by)
-            version.save()
+            changed_by = User.objects.get(**{User.USERNAME_FIELD: old_plugin.placeholder.source.changed_by})
+            version = Version.objects.create(
+                content=alias_content,
+                created_by=changed_by
+            )
             version.publish(changed_by)
 
         # create csm4 alias plugins for cms3 alias references
