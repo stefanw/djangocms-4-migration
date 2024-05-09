@@ -37,6 +37,11 @@ new_ref_alias_plugins_count = 0
 
 def _create_site_category(site, language):
     category_name = f"{site.name}-Migrated-{language}"
+    # Check to see if we have a category for this site already, and use it if we do. Little bit of
+    # a guard so that we can run migrate multiple times without creating duplicate categories.
+    category = Category.objects.filter(translations__name=category_name)
+    if category:
+        return category.get()
     category = Category.objects.language(language).create(
         name=category_name,
     )
@@ -252,7 +257,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with transaction.atomic():
             # Alias source plugin list
-            cms3_alias_ref_ids = set(AliasPluginModel.objects.values('plugin_id').order_by('plugin_id').distinct())
+            cms3_alias_ref_ids = set(AliasPluginModel.objects.values('plugin_id', flat=True).order_by('plugin_id').distinct())
             plugin_id_list = [cms3_plugin['plugin_id'] for cms3_plugin in cms3_alias_ref_ids if cms3_plugin['plugin_id']]
             alias_source_total = len(plugin_id_list)
             # Alias references list count
